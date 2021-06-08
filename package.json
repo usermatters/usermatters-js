@@ -1,7 +1,7 @@
 {
   "name": "usermatters-js",
-  "version": "0.0.0",
-  "description": "My awesome typescript library",
+  "version": "0.0.0-semantic-release",
+  "description": "The universal browser widget for User Matters",
   "publishConfig": {
     "access": "public"
   },
