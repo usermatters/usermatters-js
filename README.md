@@ -6,4 +6,4 @@ The universal browser widget for **User Matters (launching soon!)**.
 
 ## License
 
-AGPL-3.0 License &copy; User Matters.
+MIT &copy; User Matters.
