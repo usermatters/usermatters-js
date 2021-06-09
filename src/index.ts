@@ -25,9 +25,8 @@ const getPopper = (el: Element, app: any) => {
 
 export type Instance = ReturnType<typeof create>
 
-const ELEMENT_NAME = 'usermatters-app'
-
-const ssr = typeof window === 'undefined'
+const USERMATTERS = 'usermatters'
+const ELEMENT_NAME = USERMATTERS + '-app'
 
 // register the custom element in browser only
 if (typeof window !== 'undefined') {
@@ -47,21 +46,20 @@ export type App = HTMLElement & {
   focusInput: () => void
 }
 
+export const handleDocumentClick = (e: any) => {
+  const apps = document.querySelectorAll('usermatters-app') as NodeListOf<App>
+  ;[...apps].forEach((app) => {
+    if (!app.contains(e.target)) {
+      app.hide()
+    }
+  })
+}
+
 export const create = () => {
   let popper: PopperInstance | undefined
   let app: App | undefined
 
-  const hideOnClickOutside = (e: any) => {
-    if (app && !app.contains(e.target)) {
-      app.hide()
-    }
-  }
-
-  if (!ssr) {
-    document.addEventListener('click', hideOnClickOutside)
-  }
-
-  return {
+  const instance = {
     show(buttonEl: HTMLElement, { project, user, api }: Options) {
       if (!app) {
         app = document.createElement(ELEMENT_NAME) as App
@@ -88,10 +86,11 @@ export const create = () => {
     },
 
     destroy() {
-      document.removeEventListener('click', hideOnClickOutside)
       popper && popper.destroy()
       app && app.remove()
       app = popper = undefined
     },
   }
+
+  return instance
 }
