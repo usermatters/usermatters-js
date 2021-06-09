@@ -47,19 +47,19 @@ export type App = HTMLElement & {
   focusInput: () => void
 }
 
-export const hideApps = (e: any, ignoreApp?: (app: App) => boolean) => {
+export const hideApps = (ignoreApp?: (app: App) => boolean) => {
   const apps = document.querySelectorAll('usermatters-app') as NodeListOf<App>
   ;[...apps].forEach((app) => {
+    if (app.inline) return
     if (ignoreApp && ignoreApp(app)) return
-    if (!app.inline && !app.contains(e.target)) {
-      app.hide()
-    }
+    app.hide()
   })
 }
 
 export const create = () => {
   let popper: PopperInstance | undefined
   let app: App | undefined
+  let buttonElCache: HTMLElement | undefined
 
   const instance = {
     show(buttonEl: HTMLElement, { project, user, api }: Options) {
@@ -68,6 +68,7 @@ export const create = () => {
         document.body.appendChild(app)
       }
 
+      buttonElCache = buttonEl
       popper && popper.destroy()
       popper = getPopper(buttonEl, app)
 
@@ -90,7 +91,18 @@ export const create = () => {
     destroy() {
       popper && popper.destroy()
       app && app.remove()
-      app = popper = undefined
+      app = popper = buttonElCache = undefined
+    },
+
+    handleDocumentClick(e: any) {
+      if (!app || !buttonElCache) return
+
+      if (buttonElCache.contains(e.target)) {
+        // Close other apps
+        hideApps((_app) => _app === app)
+      } else if (!app.contains(e.target)) {
+        app.hide()
+      }
     },
   }
 
