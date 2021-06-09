@@ -48,6 +48,7 @@ export const create = () => {
 
       popper = getPopper(buttonEl, app)
 
+      app.buttonEl = buttonEl
       app.project = project
       app.user = user || ''
 
