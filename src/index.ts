@@ -11,6 +11,7 @@ export type Options = {
 const getPopper = (el: Element, app: any) => {
   return createPopper(el, app, {
     placement: 'bottom',
+    strategy: 'fixed',
     modifiers: [
       {
         name: 'offset',
