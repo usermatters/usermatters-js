@@ -1,4 +1,4 @@
-import { create } from './index'
+import { create, Instance } from './index'
 
 const ATTR_PREFIX = `data-usermatters-`
 const PROJECT_ATTR = `${ATTR_PREFIX}project`
@@ -18,13 +18,13 @@ const handleClick = (e: MouseEvent) => {
   const api = el.getAttribute(API_ATTR)
 
   // @ts-expect-error
-  let instance = el.usermatters
+  let instance: Instance = el.usermatters
   if (!instance) {
-    instance = create()
+    instance = create(el)
     // @ts-expect-error
     el.usermatters = instance
   }
-  instance.show(el, { project, user, api })
+  instance.show({ project, user, api })
 }
 
 document.addEventListener('click', handleClick)

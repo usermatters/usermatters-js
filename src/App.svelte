@@ -2,7 +2,6 @@
 
 <script>
   // can't use lang="ts" because the imports get removed somehow by the compiler
-  import { onMount } from 'svelte'
   import { emojiMap } from './utils'
 
   export let user = ''
@@ -12,9 +11,6 @@
   export let api = 'https://usermatters.co/api/graphql'
 
   export let open = false
-
-  /** @type {HTMLElement|undefined} */
-  export let buttonEl = undefined
 
   /** @type {any[]} */
   const clsx = (...args) => {
@@ -40,7 +36,7 @@
     textarea && textarea.focus()
   }
 
-  const hide = () => {
+  export const hide = () => {
     open = false
     status = null
   }
@@ -111,21 +107,11 @@
   }
 
   // Hide when clicked outside
-  onMount(() => {
-    const handleClick = (e) => {
-      if (buttonEl && buttonEl.contains(e.target)) return
-      if (appRef && !appRef.contains(e.target)) {
-        hide()
-      }
-    }
-    document.addEventListener('click', handleClick)
-    return () => document.removeEventListener('click', handleClick)
-  })
 
 </script>
 
 {#if open}
-  <div bind:this={appRef} class="app font-sans w-full bg-white rounded-lg">
+  <div class="app font-sans w-full bg-white rounded-lg">
     <header class="flex items-start justify-between px-4 pt-4">
       {#if status === 'success'}<span />{:else}<div>
           <h2 class="text-xl font-bold">Send feedback</h2>
