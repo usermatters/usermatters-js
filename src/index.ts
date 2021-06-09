@@ -35,21 +35,12 @@ if (typeof window !== 'undefined') {
   }
 }
 
-export const create = (buttonEl: Element) => {
+export const create = () => {
   let popper: PopperInstance | undefined
   let app: any
 
-  const handleClick = (e: any) => {
-    if (buttonEl.contains(e.target)) return
-    if (app && !app.contains(e.target)) {
-      app.hide()
-    }
-  }
-
-  document.addEventListener('click', handleClick)
-
   return {
-    show({ project, user, api }: Options) {
+    show(buttonEl: Element, { project, user, api }: Options) {
       if (!app) {
         app = document.createElement(ELEMENT_NAME)
         document.body.appendChild(app)
@@ -70,8 +61,14 @@ export const create = (buttonEl: Element) => {
       app.focusInput()
     },
 
+    handleDocumentClick(e: any, buttonEl?: Element) {
+      if (buttonEl && buttonEl.contains(e.target)) return
+      if (app && !app.contains(e.target)) {
+        app.hide()
+      }
+    },
+
     destroy() {
-      document.removeEventListener('click', handleClick)
       popper && popper.destroy()
       app && app.remove()
       app = popper = undefined
