@@ -27,6 +27,8 @@ export type Instance = ReturnType<typeof create>
 
 const ELEMENT_NAME = 'usermatters-app'
 
+const ssr = typeof window === 'undefined'
+
 // register the custom element in browser only
 if (typeof window !== 'undefined') {
   const App = require('./App.svelte')
@@ -38,6 +40,16 @@ if (typeof window !== 'undefined') {
 export const create = () => {
   let popper: PopperInstance | undefined
   let app: any
+
+  const hideOnClickOutside = (e: any) => {
+    if (app && !app.contains(e.target)) {
+      app.hide()
+    }
+  }
+
+  if (!ssr) {
+    document.addEventListener('click', hideOnClickOutside)
+  }
 
   return {
     show(buttonEl: Element, { project, user, api }: Options) {
@@ -61,14 +73,8 @@ export const create = () => {
       app.focusInput()
     },
 
-    handleDocumentClick(e: any, buttonEl?: Element) {
-      if (buttonEl && buttonEl.contains(e.target)) return
-      if (app && !app.contains(e.target)) {
-        app.hide()
-      }
-    },
-
     destroy() {
+      document.removeEventListener('click', hideOnClickOutside)
       popper && popper.destroy()
       app && app.remove()
       app = popper = undefined

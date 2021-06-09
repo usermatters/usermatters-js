@@ -8,7 +8,6 @@ const API_ATTR = `${ATTR_PREFIX}api`
 const instance = create()
 
 const handleClick = (e: MouseEvent) => {
-  instance.handleDocumentClick(e)
   // @ts-expect-error
   const el = e.target.closest(
     'button[data-usermatters-project]',
