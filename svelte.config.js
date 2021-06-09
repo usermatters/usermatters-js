@@ -1,4 +1,4 @@
-const { transform } = require('esbuild')
+const { transform } = require('sucrase')
 
 module.exports = {
   emitCss: false,
@@ -7,11 +7,11 @@ module.exports = {
   },
   preprocess: require('svelte-preprocess')({
     postcss: true,
-    async typescript({ content }) {
-      const { code, map } = await transform(content, {
-        loader: 'ts',
+    typescript({ content }) {
+      const { code } = transform(content, {
+        transforms: ['typescript'],
       })
-      return { code, map }
+      return { code }
     },
   }),
 }

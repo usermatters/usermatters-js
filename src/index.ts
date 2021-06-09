@@ -1,5 +1,7 @@
 import { createPopper, Instance as PopperInstance } from '@popperjs/core'
 
+export { emojiMap, getEmoji } from './utils'
+
 export type Options = {
   project: string
   user?: string | null

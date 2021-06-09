@@ -1,6 +1,9 @@
 <svelte:options tag="usermatters-app" />
 
-<script lang="ts">
+<script>
+  // can't use lang="ts" because the imports get removed somehow by the compiler
+  import { emojiMap } from './utils'
+
   export let user = ''
 
   export let project = ''
@@ -9,15 +12,23 @@
 
   export let open = false
 
+  /** @type {any[]} */
+  const clsx = (...args) => {
+    return args.filter(Boolean).join(' ')
+  }
+
   let content = ''
   let error = ''
-  let status: null | 'loading' | 'success' | 'error' = null
+  /** @type {null | 'loading' | 'success' | 'error'} */
+  let status = null
   let userName = ''
   let userEmail = ''
+  let reaction = ''
 
   $: isSubmitting = status === 'loading'
 
-  let textarea: HTMLTextAreaElement | undefined
+  /** @type {HTMLTextAreaElement | undefined} */
+  let textarea
 
   export const focusInput = () => {
     textarea && textarea.focus()
@@ -28,7 +39,15 @@
     status = null
   }
 
-  const getUser = (user: string) => {
+  const reset = () => {
+    content = ''
+    userEmail = ''
+    userName = ''
+    reaction = ''
+  }
+
+  /** @type {string} */
+  const getUser = (user) => {
     user = user.trim()
     if (!user) return { email: userEmail, name: userName }
 
@@ -38,7 +57,8 @@
     return { email, name }
   }
 
-  const handleSubmit = async (e: any) => {
+  /** @type {any} */
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     status = 'loading'
@@ -51,12 +71,13 @@
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        query: `mutation createFeedback($userEmail:String!,$userName:String,$content:String!,$project:String!){createFeedback(userEmail:$userEmail,userName:$userName,content:$content,project:$project) {id}}`,
+        query: `mutation createFeedback($userEmail:String!,$userName:String,$content:String!,$project:String!,$reaction:String!){createFeedback(reaction:$reaction,userEmail:$userEmail,userName:$userName,content:$content,project:$project) {id}}`,
         variables: {
           content,
           project,
           userEmail: parsedUser.email,
           userName: parsedUser.name,
+          reaction,
         },
       }),
     })
@@ -76,9 +97,7 @@
     }
 
     status = 'success'
-    content = ''
-    userEmail = ''
-    userName = ''
+    reset()
 
     setTimeout(() => {
       status = null
@@ -183,6 +202,20 @@
           {#if error}<div class="text-red-500 text-sm mt-1">{error}</div>{/if}
         </div>
         <div class="p-4 pt-0 flex items-center justify-between">
+          <div class="flex space-x-2">
+            {#each Object.keys(emojiMap) as type (type)}
+              <button
+                type="button"
+                title="Choose a reaction"
+                class={clsx(
+                  `transform transition-transform duration-150 text-xl hover:scale-150 focus:outline-none`,
+                  reaction && reaction !== type && 'opacity-50',
+                  reaction === type && 'scale-125',
+                )}
+                on:click={() => (reaction = type)}>{emojiMap[type]}</button
+              >
+            {/each}
+          </div>
           <button
             type="submit"
             class="button border border-transparent bg-blue-600 text-white focus:border-blue-700"

@@ -1,8 +1,12 @@
+import fs from 'fs'
 import { build } from 'esbuild'
-import svelte from 'rollup-plugin-svelte'
 import { rollup } from 'rollup'
-import nodeResolve from '@rollup/plugin-node-resolve'
+import * as svelte from 'svelte/compiler'
+import preprocess from 'svelte-preprocess'
 import dts from 'rollup-plugin-dts'
+
+const args = process.argv.slice(2)
+const watch = args.includes('--watch')
 
 const bundle = async ({
   input,
@@ -26,6 +30,8 @@ const bundle = async ({
     bundle: true,
     define: constants,
     minify,
+    watch,
+    incremental: true,
     plugins: [
       {
         name: 'svelte',
@@ -41,15 +47,25 @@ const bundle = async ({
           }
 
           build.onLoad({ filter: /\.svelte$/ }, async (args) => {
-            const r = await rollup({
-              input: [args.path],
-              plugins: [nodeResolve(), svelte(require('./svelte.config'))],
-            })
-            const { output } = await r.generate({
-              file: __dirname + '/out.js',
-              format: 'esm',
-            })
-            return { contents: output[0].code }
+            let content = await fs.promises.readFile(args.path, 'utf8')
+            content = await svelte
+              .preprocess(
+                content,
+                preprocess({
+                  postcss: true,
+                }),
+                {
+                  filename: args.path,
+                },
+              )
+              .then((res) => res.code)
+
+            content = svelte.compile(content, {
+              filename: args.path,
+              css: false,
+              customElement: true,
+            }).js.code
+            return { contents: content }
           })
         },
       },
@@ -64,6 +80,11 @@ const buildLibrary = async () => {
       output: './dist/widget.js',
       format: 'iife',
       minify: true,
+    }),
+    bundle({
+      input: './src/widget.ts',
+      output: './dist/widget.dev.js',
+      format: 'iife',
     }),
     bundle({
       input: './src/index.ts',
@@ -88,8 +109,6 @@ async function buildTypes() {
     dir: './dist',
   })
 }
-
-const args = process.argv.slice(2)
 
 async function main() {
   if (!args.includes('--type-only')) {
