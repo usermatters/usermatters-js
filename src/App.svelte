@@ -1,4 +1,4 @@
-<svelte:options tag="usermatters-app" />
+<svelte:options tag={null} />
 
 <script>
   // can't use lang="ts" because the imports get removed somehow by the compiler

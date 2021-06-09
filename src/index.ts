@@ -25,9 +25,14 @@ const getPopper = (el: Element, app: any) => {
 
 export type Instance = ReturnType<typeof create>
 
+const ELEMENT_NAME = 'usermatters-app'
+
 // register the custom element in browser only
 if (typeof window !== 'undefined') {
-  require('./App.svelte')
+  const App = require('./App.svelte')
+  if (!customElements.get(ELEMENT_NAME)) {
+    customElements.define(ELEMENT_NAME, App.default || App)
+  }
 }
 
 export const create = () => {
@@ -37,7 +42,7 @@ export const create = () => {
   return {
     show(buttonEl: Element, { project, user, api }: Options) {
       if (!app) {
-        app = document.createElement('usermatters-app')
+        app = document.createElement(ELEMENT_NAME)
         document.body.appendChild(app)
       }
 
@@ -62,8 +67,8 @@ export const create = () => {
     },
 
     destroy() {
-      app && app.remove()
       popper && popper.destroy()
+      app && app.remove()
       app = popper = undefined
     },
   }
