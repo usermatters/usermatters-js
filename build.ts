@@ -31,7 +31,6 @@ const bundle = async ({
     define: constants,
     minify,
     watch,
-    incremental: true,
     plugins: [
       {
         name: 'svelte',
