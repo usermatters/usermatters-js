@@ -1,4 +1,4 @@
-import { create, Instance, handleDocumentClick, App } from './index'
+import { create, Instance, hideApps, App } from './index'
 
 const ATTR_PREFIX = `data-usermatters-`
 const PROJECT_ATTR = `${ATTR_PREFIX}project`
@@ -6,7 +6,7 @@ const USER_ATTR = `${ATTR_PREFIX}user`
 const API_ATTR = `${ATTR_PREFIX}api`
 
 const handleClick = (e: MouseEvent) => {
-  handleDocumentClick(e)
+  hideApps(e)
 
   // @ts-expect-error
   const el = e.target.closest(

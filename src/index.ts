@@ -47,11 +47,10 @@ export type App = HTMLElement & {
   focusInput: () => void
 }
 
-export const handleDocumentClick = (e: any, buttonEl?: HTMLElement) => {
-  if (buttonEl && buttonEl.contains(e.target)) return
-
+export const hideApps = (e: any, ignoreApp?: (app: App) => boolean) => {
   const apps = document.querySelectorAll('usermatters-app') as NodeListOf<App>
   ;[...apps].forEach((app) => {
+    if (ignoreApp && ignoreApp(app)) return
     if (!app.inline && !app.contains(e.target)) {
       app.hide()
     }
