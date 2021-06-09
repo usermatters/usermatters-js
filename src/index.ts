@@ -43,6 +43,7 @@ export type App = HTMLElement & {
   user: string
   api: string
   open: boolean
+  inline?: boolean
   focusInput: () => void
 }
 
@@ -51,7 +52,7 @@ export const handleDocumentClick = (e: any, buttonEl?: HTMLElement) => {
 
   const apps = document.querySelectorAll('usermatters-app') as NodeListOf<App>
   ;[...apps].forEach((app) => {
-    if (!app.contains(e.target)) {
+    if (!app.inline && !app.contains(e.target)) {
       app.hide()
     }
   })
