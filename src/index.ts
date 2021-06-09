@@ -37,9 +37,19 @@ if (typeof window !== 'undefined') {
   }
 }
 
+export type App = HTMLElement & {
+  hide: () => void
+  buttonEl: HTMLElement
+  project: string
+  user: string
+  api: string
+  open: boolean
+  focusInput: () => void
+}
+
 export const create = () => {
   let popper: PopperInstance | undefined
-  let app: any
+  let app: App | undefined
 
   const hideOnClickOutside = (e: any) => {
     if (app && !app.contains(e.target)) {
@@ -52,9 +62,9 @@ export const create = () => {
   }
 
   return {
-    show(buttonEl: Element, { project, user, api }: Options) {
+    show(buttonEl: HTMLElement, { project, user, api }: Options) {
       if (!app) {
-        app = document.createElement(ELEMENT_NAME)
+        app = document.createElement(ELEMENT_NAME) as App
         document.body.appendChild(app)
       }
 
@@ -71,6 +81,10 @@ export const create = () => {
       app.open = true
 
       app.focusInput()
+    },
+
+    getApp() {
+      return app
     },
 
     destroy() {
